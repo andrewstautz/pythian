@@ -9,6 +9,8 @@ import datetime
 import io
 import codecs
 import pickle
+import matplotlib as mpl
+mpl.use('Agg')
 from matplotlib.pyplot import savefig
 import urllib
 

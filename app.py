@@ -15,6 +15,9 @@ from matplotlib.pyplot import savefig
 import urllib
 import os
 
+from rq import Queue
+from worker import conn
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -261,7 +264,8 @@ def update_output_div(n_clicks):
 def run_calculation(n_clicks, forecast_periods, contents, filename):
      if n_clicks > 0:
         data = parse_contents(contents, filename)
-        calculated_data = main_script(data, forecast_periods)
+        q = Queue(connection=conn)
+        calculated_data = q.enqueue(main_script, data, forecast_periods)
         return codecs.encode(pickle.dumps(calculated_data), "base64").decode()
 
 #

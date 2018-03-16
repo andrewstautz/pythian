@@ -30,7 +30,9 @@ pyparsing==2.2.0
 pystan==2.17.1.0
 python-dateutil==2.7.0
 pytz==2018.3
+redis==2.10.6
 requests==2.18.4
+rq==0.10.0
 six==1.11.0
 tornado==4.5.3
 traitlets==4.3.2

@@ -265,7 +265,8 @@ def run_calculation(n_clicks, forecast_periods, contents, filename):
      if n_clicks > 0:
         data = parse_contents(contents, filename)
         q = Queue(connection=conn)
-        calculated_data = q.enqueue(main_script, data, forecast_periods)
+        job = q.enqueue_call(func=main_script, args=(data, forecast_periods))
+        calculated_data = job.result
         return codecs.encode(pickle.dumps(calculated_data), "base64").decode()
 
 #

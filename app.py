@@ -13,6 +13,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 from matplotlib.pyplot import savefig
 import urllib
+import os
 
 import dash
 import dash_core_components as dcc
@@ -109,6 +110,7 @@ def main_script(data, forecast_periods):
 
 # Instantiate app.
 app = dash.Dash()
+server = app.server
 
 # Holidays dataframe (static global variable) 
 holidays = pd.DataFrame({'holiday': ['New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 

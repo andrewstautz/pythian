@@ -6,6 +6,7 @@
 
 import base64
 import datetime
+import time as t
 import io
 import codecs
 import pickle
@@ -313,7 +314,7 @@ def update_results_tables(n_intervals, job_id):
             # results aren't ready, pause then return empty results
             # You will need to fine tune this interval depending on
             # your environment
-            time.sleep(5)
+            t.sleep(5)
             return ''
         if result is not None:
             # results are ready

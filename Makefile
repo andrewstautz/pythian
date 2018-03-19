@@ -2,6 +2,10 @@
 build:
 	@bash -x scripts/build.sh
 
+## Push container
+push:
+	@bash -x scripts/push.sh
+
 ## Run container locally
 run:
 	@bash -x scripts/run.sh

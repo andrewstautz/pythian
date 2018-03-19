@@ -17,6 +17,7 @@ import os
 
 from rq import Queue
 from worker import conn
+import uuid
 
 import dash
 import dash_core_components as dcc
@@ -106,7 +107,7 @@ def main_script(data, forecast_periods):
                                 'models': models,
                                 #'plots': plots,
                                 'forecasts': forecasts})
-    return complete #The output table with forecast, plots, and errors by group.
+    return codecs.encode(pickle.dumps(complete), "base64").decode() #The output table with forecast, plots, and errors by group, encoded as pickle.
 
 
 ####
@@ -195,7 +196,15 @@ app.layout = html.Div([
             n_clicks=0, 
             children='Go!'),
         html.P(id='go_button_confirmation'),
-        html.Div(id='intermediate_value', style={'display': 'none'}),
+        html.Div(id='intermediate_value', style={'display': 'none'}), # my original invisible div for results...
+        html.Div(id='status'), # Div to show status message
+        html.Div(id='job_id', style={'display': 'none'}), # invisible div to store current job ID.
+        dcc.Interval(
+            id='update_interval',
+            interval=60*60*5000, # in milliseconds
+            n_intervals=0
+        ), # This (invisible?) element controls report refresh.
+
         # Groups dropdown div.
         html.Div([dcc.Dropdown(
                      id='groups_dropdown',
@@ -253,28 +262,116 @@ def update_output_div(n_clicks):
     if n_clicks > 0:
         return 'We\'re on our way.'
 
-# Computation step callback (main script here)
+    
+# this callback checks submits the query as a new job, returning job_id to the invisible div
 @app.callback(
-    Output('intermediate_value', 'children'), 
+    Output('job_id', 'children'),
     [Input('go_button', 'n_clicks'),
      Input('forecast_periods_slider', 'value'),
      Input('upload_data', 'contents'),
-     Input('upload_data', 'filename')]
-)
-def run_calculation(n_clicks, forecast_periods, contents, filename):
-     if n_clicks > 0:
+     Input('upload_data', 'filename')])
+def query_submitted(click, forecast_periods, contents, filename):
+    if click == 0 or click is None:
+        return ''
+    else:
+        # a query was submitted, so queue it up and return job_id
         data = parse_contents(contents, filename)
+        duration = 20           # pretend the process takes 20 seconds to complete
         q = Queue(connection=conn)
-        job = q.enqueue_call(func=main_script, args=(data, forecast_periods))
-        if job is not None:
-            if job.result is not None:
-                calculated_data = job.result
-                return codecs.encode(pickle.dumps(calculated_data), "base64").decode()
+        job_id = str(uuid.uuid4())
+        job = q.enqueue_call(func=main_script, 
+                                args=(data, forecast_periods),
+                                timeout='3m',
+                                job_id=job_id)
+        return job_id
 
+
+#
+# To encode results table:
+# codecs.encode(pickle.dumps(calculated_data), "base64").decode()
 #
 # To decode string in hidden div:
 # unpickled = pickle.loads(codecs.decode(OBJECT.encode(), "base64"))
 #
+
+
+# this callback checks if the job result is ready.  If it's ready
+# the results return to the table.  If it's not ready, it pauses
+# for a short moment, then empty results are returned.  If there is
+# no job, then empty results are returned. 
+@app.callback(
+    Output('intermediate_value', 'children'),
+    [Input('update_interval', 'n_intervals')],
+    [State('job_id', 'children')])
+def update_results_tables(n_intervals, job_id):
+    q = Queue(connection=conn)
+    job = q.fetch_job(job_id)
+    if job is not None:
+        # job exists - try to get result
+        result = job.result
+        if result is None:
+            # results aren't ready, pause then return empty results
+            # You will need to fine tune this interval depending on
+            # your environment
+            time.sleep(5)
+            return ''
+        if result is not None:
+            # results are ready
+            return result
+    else:
+        # no job exists with this id
+        return ''
+
+
+# this callback orders the table to be regularly refreshed if
+# the user is waiting for results, or to be static (refreshed once
+# per hour) if they are not.
+@app.callback(
+    dash.dependencies.Output('update_interval', 'interval'),
+    [dash.dependencies.Input('job_id', 'children'),
+    dash.dependencies.Input('update_interval', 'n_intervals')])
+def stop_or_start_table_update(job_id, n_intervals):
+    q = Queue(connection=conn)
+    job = q.fetch_job(job_id)
+    if job is not None:
+        # the job exists - try to get results
+        result = job.result
+        if result is None:
+            # a job is in progress but we're waiting for results
+            # therefore regular refreshing is required.  You will
+            # need to fine tune this interval depending on your
+            # environment.
+            return 1000
+        else:
+            # the results are ready, therefore stop regular refreshing
+            return 60*60*1000  
+    else:
+        # the job does not exist, therefore stop regular refreshing
+        return 60*60*1000
+
+
+# this callback displays a please wait message in the status div if
+# the user is waiting for results, or nothing if they are not.
+@app.callback(
+    dash.dependencies.Output('status', 'children'),
+    [dash.dependencies.Input('job_id', 'children'),
+    dash.dependencies.Input('update_interval', 'n_intervals')])
+def stop_or_start_table_update(job_id, n_intervals):
+    q = Queue(connection=conn)
+    job = q.fetch_job(job_id)
+    if job is not None:
+        # the job exists - try to get results
+        result = job.result
+        if result is None:
+            # a job is in progress and we're waiting for results
+            return 'Running query.  This might take a moment - don\'t close your browser!'
+        else:
+            # the results are ready, therefore no message
+            return ''  
+    else:
+        # the job does not exist, therefore no message
+        return ''
+
 
 # Groups dropdown callback.
 @app.callback(

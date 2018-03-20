@@ -73,3 +73,12 @@ def convert_fig_to_html(fig):
     return uri
 
 
+# Encode as portable pickled string
+def encode(results):
+    pickled_results = codecs.encode(pickle.dumps(results), "base64").decode()
+    return pickled_results
+
+# Decode from portable pickled string
+def decode(pickled_results):
+    unpickled = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+    return unpickled

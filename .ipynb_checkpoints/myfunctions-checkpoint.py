@@ -25,6 +25,8 @@ import pandas as pd
 from fbprophet import Prophet
 from fbprophet.diagnostics import cross_validation
 
+import myhelpers
+
 
 # Holidays dataframe (static global variable)
 holidays = pd.DataFrame({'holiday': ['New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
@@ -102,4 +104,4 @@ def calculation_script(data, forecast_periods):
                                 'models': models,
                                 #'plots': plots,
                                 'forecasts': forecasts})
-    return codecs.encode(pickle.dumps(complete), "base64").decode() #The output table with forecast, plots, and errors by group, encoded as pickle.
+    return myhelpers.encode(complete) #The output table with forecast, plots, and errors by group, encoded as pickle.

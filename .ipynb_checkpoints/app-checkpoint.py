@@ -123,7 +123,7 @@ app.layout = html.Div([
 ]) # Close app layout.
 
 
-# Upload confirmation callback
+# Upload confirmation callback.
 @app.callback(
     Output('upload_confirmation', 'children'),
     [Input('upload_data', 'contents')]
@@ -133,7 +133,7 @@ def confirm_upload(contents):
         children = html.Div('Looking good...')
         return children
 
-# Go button confirmation callback (placeholder)
+# Go button confirmation callback.
 @app.callback(
     Output(component_id='go_button_confirmation', component_property='children'),
     [Input(component_id='go_button', component_property='n_clicks')]
@@ -261,7 +261,7 @@ def stop_or_start_table_update(job_id, n_intervals):
 def update_dropdown(pickled_results):
     if pickled_results is not None:
         # Decode the results dataframe.
-        dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+        dataframe = myhelpers.decode(pickled_results)
         # Make list of dicts with index as both label and value.
         options = [{'label': k, 'value': k} for k in dataframe.index]
         return options
@@ -278,7 +278,7 @@ def update_dropdown(pickled_results):
 def update_error_table(value, pickled_results):
     if value is not None:
         # Decode the results dataframe.
-        dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+        dataframe = myhelpers.decode(pickled_results)
         data = dataframe['error_mape'][value]
         mape = '{:.2%}'.format(data)
         return 'MAPE: ' + mape
@@ -293,7 +293,7 @@ def update_error_table(value, pickled_results):
 def update_error_table(value, pickled_results):
     if value is not None:
         # Decode the results dataframe.
-        dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+        dataframe = myhelpers.decode(pickled_results)
         data = dataframe['error_rmse'][value]
         rmse = '{:.2f}'.format(data)
         return 'RMSE: ' + rmse
@@ -309,7 +309,7 @@ def update_error_table(value, pickled_results):
 def update_table(value, pickled_results, forecast_period):
     if value is not None:
         # Decode the results dataframe.
-        dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+        dataframe = myhelpers.decode(pickled_results)
         data = (
             dataframe['forecasts'][value]
             .tail(forecast_period)
@@ -331,7 +331,7 @@ def update_table(value, pickled_results, forecast_period):
 def update_plot(value, pickled_results):
     if value is not None:
         # Decode the results dataframe.
-        dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+        dataframe = myhelpers.decode(pickled_results)
         fig = dataframe['models'][value].plot(dataframe['forecasts'][value])
         return myhelpers.convert_fig_to_html(fig)
 
@@ -343,7 +343,7 @@ def update_plot(value, pickled_results):
 def update_download_link(value, pickled_results):
     if value is not None:
         # Decode the results dataframe.
-        dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
+        dataframe = myhelpers.decode(pickled_results)
         data = dataframe['forecasts'][value]
         csv_string = data.to_csv(index=False, encoding='utf-8')
         csv_string = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv_string)

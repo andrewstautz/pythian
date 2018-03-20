@@ -72,10 +72,10 @@ def convert_fig_to_html(fig):
     fig.savefig(buf, format='png')
     buf.seek(0)
     string = base64.b64encode(buf.read())
-    
+
     uri = 'data:image/png;base64,' + urllib.parse.quote(string)
     # html = '<img src = "%s"/>' % uri
-    
+
     return uri
 
 
@@ -117,49 +117,49 @@ def main_script(data, forecast_periods):
 app = dash.Dash()
 server = app.server
 
-# Holidays dataframe (static global variable) 
-holidays = pd.DataFrame({'holiday': ['New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day', 
-                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day', 
-                                     'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 
-                                     'Christmas Eve', 'New Years Eve', 'New Years Eve', 'New Years Eve', 'New Years Eve', 'New Years Eve', 
-                                     'New Years Eve', 'New Years Eve', 'Valentines Day', 'Valentines Day', 'Valentines Day', 'Valentines Day', 
-                                     'Valentines Day', 'Valentines Day', 'Valentines Day', 'Halloween', 'Halloween', 'Halloween', 'Halloween', 
-                                     'Halloween', 'Halloween', 'Halloween', 'iPhone Launch', 'iPhone Launch', 'iPhone Launch', 'iPhone Launch', 
-                                     'iPhone Launch', 'iPhone Launch', 'Pixel Launch', 'Pixel Launch', 'Easter', 'Easter', 'Easter', 'Easter', 
-                                     'Easter', 'Easter', 'Easter', 'Samsung Launch', 'Samsung Launch', 'Samsung Launch', 'Samsung Launch', 
+# Holidays dataframe (static global variable)
+holidays = pd.DataFrame({'holiday': ['New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'New Year Day', 'Martin Luther King Jr. Day', 'Presidents Day', 'Memorial Day', 'Independence Day',
+                                     'Labor Day', 'Columbus Day', 'Veterans Day', 'Thanksgiving Day', 'Black Friday', 'Christmas Day',
+                                     'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 'Christmas Eve', 'Christmas Eve',
+                                     'Christmas Eve', 'New Years Eve', 'New Years Eve', 'New Years Eve', 'New Years Eve', 'New Years Eve',
+                                     'New Years Eve', 'New Years Eve', 'Valentines Day', 'Valentines Day', 'Valentines Day', 'Valentines Day',
+                                     'Valentines Day', 'Valentines Day', 'Valentines Day', 'Halloween', 'Halloween', 'Halloween', 'Halloween',
+                                     'Halloween', 'Halloween', 'Halloween', 'iPhone Launch', 'iPhone Launch', 'iPhone Launch', 'iPhone Launch',
+                                     'iPhone Launch', 'iPhone Launch', 'Pixel Launch', 'Pixel Launch', 'Easter', 'Easter', 'Easter', 'Easter',
+                                     'Easter', 'Easter', 'Easter', 'Samsung Launch', 'Samsung Launch', 'Samsung Launch', 'Samsung Launch',
                                      'Samsung Launch'],
-                         'ds': pd.to_datetime(['2014-01-01', '2014-01-20', '2014-02-17', '2014-05-26', '2014-07-04', '2014-09-01', 
-                                               '2014-10-13', '2014-11-11', '2014-11-27', '2014-11-28', '2014-12-25', '2015-01-01', 
-                                               '2015-01-19', '2015-02-16', '2015-05-25', '2015-07-03', '2015-09-07', '2015-10-12', 
-                                               '2015-11-11', '2015-11-26', '2015-11-27', '2015-12-25', '2016-01-01', '2016-01-18', 
-                                               '2016-02-15', '2016-05-30', '2016-07-04', '2016-09-05', '2016-10-10', '2016-11-11', 
-                                               '2016-11-24', '2016-11-25', '2016-12-25', '2017-01-02', '2017-01-16', '2017-02-20', 
-                                               '2017-05-29', '2017-07-04', '2017-09-04', '2017-10-09', '2017-11-10', '2017-11-23', 
-                                               '2017-11-24', '2017-12-25', '2018-01-01', '2018-01-15', '2018-02-19', '2018-05-28', 
-                                               '2018-07-04', '2018-09-03', '2018-10-08', '2018-11-12', '2018-11-22', '2018-11-23', 
-                                               '2018-12-25', '2019-01-01', '2019-01-21', '2019-02-18', '2019-05-27', '2019-07-04', 
-                                               '2019-09-02', '2019-10-14', '2019-11-11', '2019-11-28', '2019-11-29', '2019-12-25', 
-                                               '2020-01-01', '2020-01-20', '2020-02-17', '2020-05-25', '2020-07-03', '2020-09-07', 
-                                               '2020-10-12', '2020-11-11', '2020-11-26', '2020-11-27', '2020-12-25', '2014-12-24', 
-                                               '2015-12-24', '2016-12-24', '2017-12-24', '2018-12-24', '2019-12-24', '2020-12-24', 
-                                               '2014-12-31', '2015-12-31', '2016-12-31', '2017-12-31', '2018-12-31', '2019-12-31', 
-                                               '2020-12-31', '2014-02-14', '2015-02-14', '2016-02-14', '2017-02-14', '2018-02-14', 
-                                               '2019-02-14', '2020-02-14', '2014-10-31', '2015-10-31', '2016-10-31', '2017-10-31', 
-                                               '2018-10-31', '2019-10-31', '2020-10-31', '2014-09-19', '2015-09-25', '2016-03-31', 
-                                               '2016-09-16', '2017-09-22', '2017-11-03', '2016-10-20', '2017-10-19', '2014-04-20', 
-                                               '2015-04-05', '2016-03-27', '2017-04-16', '2018-04-01', '2019-04-21', '2020-04-12', 
+                         'ds': pd.to_datetime(['2014-01-01', '2014-01-20', '2014-02-17', '2014-05-26', '2014-07-04', '2014-09-01',
+                                               '2014-10-13', '2014-11-11', '2014-11-27', '2014-11-28', '2014-12-25', '2015-01-01',
+                                               '2015-01-19', '2015-02-16', '2015-05-25', '2015-07-03', '2015-09-07', '2015-10-12',
+                                               '2015-11-11', '2015-11-26', '2015-11-27', '2015-12-25', '2016-01-01', '2016-01-18',
+                                               '2016-02-15', '2016-05-30', '2016-07-04', '2016-09-05', '2016-10-10', '2016-11-11',
+                                               '2016-11-24', '2016-11-25', '2016-12-25', '2017-01-02', '2017-01-16', '2017-02-20',
+                                               '2017-05-29', '2017-07-04', '2017-09-04', '2017-10-09', '2017-11-10', '2017-11-23',
+                                               '2017-11-24', '2017-12-25', '2018-01-01', '2018-01-15', '2018-02-19', '2018-05-28',
+                                               '2018-07-04', '2018-09-03', '2018-10-08', '2018-11-12', '2018-11-22', '2018-11-23',
+                                               '2018-12-25', '2019-01-01', '2019-01-21', '2019-02-18', '2019-05-27', '2019-07-04',
+                                               '2019-09-02', '2019-10-14', '2019-11-11', '2019-11-28', '2019-11-29', '2019-12-25',
+                                               '2020-01-01', '2020-01-20', '2020-02-17', '2020-05-25', '2020-07-03', '2020-09-07',
+                                               '2020-10-12', '2020-11-11', '2020-11-26', '2020-11-27', '2020-12-25', '2014-12-24',
+                                               '2015-12-24', '2016-12-24', '2017-12-24', '2018-12-24', '2019-12-24', '2020-12-24',
+                                               '2014-12-31', '2015-12-31', '2016-12-31', '2017-12-31', '2018-12-31', '2019-12-31',
+                                               '2020-12-31', '2014-02-14', '2015-02-14', '2016-02-14', '2017-02-14', '2018-02-14',
+                                               '2019-02-14', '2020-02-14', '2014-10-31', '2015-10-31', '2016-10-31', '2017-10-31',
+                                               '2018-10-31', '2019-10-31', '2020-10-31', '2014-09-19', '2015-09-25', '2016-03-31',
+                                               '2016-09-16', '2017-09-22', '2017-11-03', '2016-10-20', '2017-10-19', '2014-04-20',
+                                               '2015-04-05', '2016-03-27', '2017-04-16', '2018-04-01', '2019-04-21', '2020-04-12',
                                                '2014-04-11', '2015-04-10', '2016-03-11', '2017-04-21', '2018-03-16'])})
 
 # App layout.
@@ -193,8 +193,8 @@ app.layout = html.Div([
             style={'height':100, 'width':'100%', 'display':'inline-block'}
         ), # Close forecast slider div.
         html.Button(
-            id='go_button', 
-            n_clicks=0, 
+            id='go_button',
+            n_clicks=0,
             children='Go!'),
         html.P(id='go_button_confirmation'),
         html.Div(id='intermediate_value', style={'display': 'none'}), # my original invisible div for results...
@@ -209,7 +209,7 @@ app.layout = html.Div([
         # Groups dropdown div.
         html.Div([dcc.Dropdown(
                      id='groups_dropdown',
-                     placeholder='Select a group.')], 
+                     placeholder='Select a group.')],
                  style={'height':30, 'width':'100%', 'display':'inline-block'}
                 ), # Close groups dropdown div.
         html.H6(id='mape', style={'color':'rgb(23,107,143)'}),
@@ -220,7 +220,7 @@ app.layout = html.Div([
                  'width': 360,
                  }
     ), # Close sidebar
-    
+
     # Main panel
     html.Div([
         html.Img(id='plot'),
@@ -263,7 +263,7 @@ def update_output_div(n_clicks):
     if n_clicks > 0:
         return 'We\'re on our way.'
 
-    
+
 # this callback checks submits the query as a new job, returning job_id to the invisible div
 @app.callback(
     Output('job_id', 'children'),
@@ -280,7 +280,7 @@ def query_submitted(click, forecast_periods, contents, filename):
         duration = 20           # pretend the process takes 20 seconds to complete
         q = Queue(connection=conn)
         job_id = str(uuid.uuid4())
-        job = q.enqueue_call(func=main_script, 
+        job = q.enqueue_call(func=main_script,
                                 args=(data, forecast_periods),
                                 timeout='3m',
                                 job_id=job_id)
@@ -299,7 +299,7 @@ def query_submitted(click, forecast_periods, contents, filename):
 # this callback checks if the job result is ready.  If it's ready
 # the results return to the table.  If it's not ready, it pauses
 # for a short moment, then empty results are returned.  If there is
-# no job, then empty results are returned. 
+# no job, then empty results are returned.
 @app.callback(
     Output('intermediate_value', 'children'),
     [Input('update_interval', 'n_intervals')],
@@ -345,7 +345,7 @@ def stop_or_start_table_update(job_id, n_intervals):
             return 1000
         else:
             # the results are ready, therefore stop regular refreshing
-            return 60*60*1000  
+            return 60*60*1000
     else:
         # the job does not exist, therefore stop regular refreshing
         return 60*60*1000
@@ -368,7 +368,7 @@ def stop_or_start_table_update(job_id, n_intervals):
             return 'Running query.  This might take a moment - don\'t close your browser!'
         else:
             # the results are ready, therefore no message
-            return ''  
+            return ''
     else:
         # the job does not exist, therefore no message
         return ''
@@ -376,7 +376,7 @@ def stop_or_start_table_update(job_id, n_intervals):
 
 # Groups dropdown callback.
 @app.callback(
-    Output('groups_dropdown', 'options'), 
+    Output('groups_dropdown', 'options'),
     [Input('intermediate_value', 'children')]
 )
 def update_dropdown(pickled_results):
@@ -389,10 +389,10 @@ def update_dropdown(pickled_results):
     else:
         return [{}]
 
-    
+
 # MAPE error callback
 @app.callback(
-    Output('mape', 'children'), 
+    Output('mape', 'children'),
     [Input('groups_dropdown', 'value'),
      Input('intermediate_value', 'children')]
 )
@@ -404,10 +404,10 @@ def update_error_table(value, pickled_results):
         mape = '{:.2%}'.format(data)
         return 'MAPE: ' + mape
 
-    
+
 # RMSE error callback
 @app.callback(
-    Output('rmse', 'children'), 
+    Output('rmse', 'children'),
     [Input('groups_dropdown', 'value'),
      Input('intermediate_value', 'children')]
 )
@@ -418,11 +418,11 @@ def update_error_table(value, pickled_results):
         data = dataframe['error_rmse'][value]
         rmse = '{:.2f}'.format(data)
         return 'RMSE: ' + rmse
-    
-    
+
+
 # Results table callback
 @app.callback(
-    Output('results_table', 'children'), 
+    Output('results_table', 'children'),
     [Input('groups_dropdown', 'value'),
      Input('intermediate_value', 'children'),
      Input('forecast_periods_slider', 'value')]
@@ -435,9 +435,9 @@ def update_table(value, pickled_results, forecast_period):
             dataframe['forecasts'][value]
             .tail(forecast_period)
             [['ds', 'yhat','yhat_lower','yhat_upper']]
-            .rename({'ds':'Date', 
-                     'yhat':'Forecast', 
-                     'yhat_lower':'Lower Bound', 
+            .rename({'ds':'Date',
+                     'yhat':'Forecast',
+                     'yhat_lower':'Lower Bound',
                      'yhat_upper':'Upper Bound'}
                      ,axis='columns')
         )
@@ -445,7 +445,7 @@ def update_table(value, pickled_results, forecast_period):
 
 # Plot forecast callback
 @app.callback(
-    Output('plot', 'src'), 
+    Output('plot', 'src'),
     [Input('groups_dropdown', 'value'),
      Input('intermediate_value', 'children')]
 )
@@ -493,11 +493,11 @@ def make_download_button(value):
     else:
         return ''
 
-    
+
 app.css.append_css({
     'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 })
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host="0.0.0.0")
 

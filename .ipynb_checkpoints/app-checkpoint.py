@@ -155,7 +155,7 @@ def query_submitted(click, forecast_periods, contents, filename):
         return ''
     else:
         # a query was submitted, so queue it up and return job_id
-        data = parse_contents(contents, filename)
+        data = myhelpers.parse_contents(contents, filename)
         duration = 20           # pretend the process takes 20 seconds to complete
         q = Queue(connection=conn)
         job_id = str(uuid.uuid4())
@@ -320,7 +320,7 @@ def update_table(value, pickled_results, forecast_period):
                      'yhat_upper':'Upper Bound'}
                      ,axis='columns')
         )
-        return generate_table(data)
+        return myhelpers.generate_table(data)
 
 # Plot forecast callback
 @app.callback(
@@ -333,7 +333,7 @@ def update_plot(value, pickled_results):
         # Decode the results dataframe.
         dataframe = pickle.loads(codecs.decode(pickled_results.encode(), "base64"))
         fig = dataframe['models'][value].plot(dataframe['forecasts'][value])
-        return convert_fig_to_html(fig)
+        return myhelpers.convert_fig_to_html(fig)
 
 # Download link content callback
 @app.callback(

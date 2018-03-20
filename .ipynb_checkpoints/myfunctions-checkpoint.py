@@ -1,3 +1,7 @@
+import numpy as np
+import pandas as pd
+from fbprophet import Prophet
+from fbprophet.diagnostics import cross_validation
 
 # Main calculation script.
 def calculation_script(data, forecast_periods):

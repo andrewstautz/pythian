@@ -1,7 +1,30 @@
+
+import base64
+import datetime
+import time as t
+import io
+import codecs
+import pickle
+import matplotlib as mpl
+mpl.use('Agg')
+from matplotlib.pyplot import savefig
+import urllib
+import os
+
+from rq import Queue
+from worker import conn
+import uuid
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output, State, Event
+import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
 from fbprophet import Prophet
 from fbprophet.diagnostics import cross_validation
+
 
 # Main calculation script.
 def calculation_script(data, forecast_periods):
